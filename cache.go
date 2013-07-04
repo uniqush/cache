@@ -52,6 +52,10 @@ type Cache struct {
 	maxNrDirty  int
 }
 
+func (c *Cache) Len() int {
+	return len(c.data)
+}
+
 func (c *Cache) Flush() {
 	c.mu.Lock()
 	defer c.mu.Unlock()
@@ -97,13 +101,13 @@ func (c *Cache) checkAndFlush() {
 	}
 }
 
-// capacity: nr elements in the cache. 
+// capacity: nr elements in the cache.
 //  < 0 means always in memory;
 //  = 0 means no cache.
 // maxNrDirty: < 0 means no flush.
-// flushPeriod: 
-//  > 1 second means periodically flush; 
-//  0 second means no periodically flush; 
+// flushPeriod:
+//  > 1 second means periodically flush;
+//  0 second means no periodically flush;
 //  undefined in range (0, 1).
 func New(capacity int, maxNrDirty int, flushPeriod time.Duration, flusher Flusher) *Cache {
 	cache := new(Cache)

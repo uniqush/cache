@@ -102,13 +102,15 @@ func (c *Cache) checkAndFlush() {
 }
 
 // capacity: nr elements in the cache.
-//  < 0 means always in memory;
-//  = 0 means no cache.
+// capacity < 0 means always in memory;
+// capacity = 0 means no cache.
+//
 // maxNrDirty: < 0 means no flush.
+//
 // flushPeriod:
-//  > 1 second means periodically flush;
-//  0 second means no periodically flush;
-//  undefined in range (0, 1).
+// flushPeriod > 1 second means periodically flush;
+// flushPeriod = 0 second means no periodically flush;
+// undefined in range (0, 1).
 func New(capacity int, maxNrDirty int, flushPeriod time.Duration, flusher Flusher) *Cache {
 	cache := new(Cache)
 
@@ -126,8 +128,10 @@ func New(capacity int, maxNrDirty int, flushPeriod time.Duration, flusher Flushe
 
 	if flushPeriod.Seconds() > 0.9 {
 		go func() {
-			time.Sleep(flushPeriod)
-			cache.Flush()
+			for {
+				time.Sleep(flushPeriod)
+				cache.Flush()
+			}
 		}()
 	}
 	return cache
